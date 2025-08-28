@@ -234,29 +234,32 @@ export function DigitalReceipt() {
     setShowPromoPopup(true)
   }, [])
 
-  // Auto-resize iframe height for WordPress embed
+    // Auto-resize iframe height for WordPress embed
   useEffect(() => {
     const postHeight = () => {
       if (window.parent) {
-        window.parent.postMessage({ frameHeight: document.body.scrollHeight }, "*")
+        window.parent.postMessage(
+          { frameHeight: document.body.scrollHeight },
+          "*"
+        );
       }
-    }
+    };
 
-    // Run on load
-    postHeight()
+    // Run once at mount
+    postHeight();
 
-    // Run on window resize
-    window.addEventListener("resize", postHeight)
+    // Run on resize
+    window.addEventListener("resize", postHeight);
 
-    // Run on DOM/content changes (collapsible open/close)
-    const observer = new MutationObserver(postHeight)
-    observer.observe(document.body, { childList: true, subtree: true, attributes: true })
+    // Watch for DOM changes (collapsible sections, history modal, etc.)
+    const observer = new MutationObserver(postHeight);
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true });
 
     return () => {
-      window.removeEventListener("resize", postHeight)
-      observer.disconnect()
-    }
-  }, [])
+      window.removeEventListener("resize", postHeight);
+      observer.disconnect();
+    };
+  }, []);
 
   return (
     <div className="w-full max-w-sm mx-auto bg-white relative">
