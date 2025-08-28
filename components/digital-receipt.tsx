@@ -4,7 +4,7 @@ import type React from "react"
 
 import { Separator } from "@/components/ui/separator"
 import { Card, CardContent } from "@/components/ui/card"
-import { Star, QrCode, Download, History, Share2, X, Gift } from "lucide-react"
+import { Star, QrCode, Download, History, Share2, X } from "lucide-react"
 import Image from "next/image"
 import { useState, useRef, useEffect } from "react"
 
@@ -234,32 +234,29 @@ export function DigitalReceipt() {
     setShowPromoPopup(true)
   }, [])
 
-      // Auto-resize iframe height for WordPress embed
+  // Auto-resize iframe height for WordPress embed
   useEffect(() => {
     const postHeight = () => {
       if (window.parent) {
-        window.parent.postMessage(
-          { frameHeight: document.body.scrollHeight },
-          "*"
-        );
+        window.parent.postMessage({ frameHeight: document.body.scrollHeight }, "*")
       }
-    };
+    }
 
     // Run once at mount
-    postHeight();
+    postHeight()
 
     // Run on resize
-    window.addEventListener("resize", postHeight);
+    window.addEventListener("resize", postHeight)
 
     // Watch for DOM changes (collapsible sections, history modal, etc.)
-    const observer = new MutationObserver(postHeight);
-    observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+    const observer = new MutationObserver(postHeight)
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true })
 
     return () => {
-      window.removeEventListener("resize", postHeight);
-      observer.disconnect();
-    };
-  }, []);
+      window.removeEventListener("resize", postHeight)
+      observer.disconnect()
+    }
+  }, [])
 
   return (
     <div className="w-full max-w-sm mx-auto bg-white relative">
@@ -409,23 +406,6 @@ export function DigitalReceipt() {
             <div className="flex justify-between">
               <span>Status</span>
               <span className="text-green-600 font-medium">Paid</span>
-            </div>
-          </div>
-        </div>
-
-        <Separator />
-
-        <div className="flex gap-3">
-          <div className="flex-1">
-            <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
-              <div className="flex items-center gap-2 mb-2">
-                <Gift className="text-blue-900" size={16} />
-                <span className="font-semibold text-sm text-blue-900">Special Offer!</span>
-              </div>
-              <p className="text-xs text-blue-800 mb-2">Get 20% off on your next purchase</p>
-              <Button size="sm" className="w-full bg-blue-900 text-white text-xs">
-                Shop Now
-              </Button>
             </div>
           </div>
         </div>
