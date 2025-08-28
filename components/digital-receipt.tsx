@@ -4,7 +4,7 @@ import type React from "react"
 
 import { Separator } from "@/components/ui/separator"
 import { Card, CardContent } from "@/components/ui/card"
-import { Star, QrCode, Download, History, Share2, X } from "lucide-react"
+import { Star, QrCode, Download, History, Mail, X, Facebook, Instagram, Globe } from "lucide-react"
 import Image from "next/image"
 import { useState, useRef, useEffect } from "react"
 
@@ -32,6 +32,7 @@ export function DigitalReceipt() {
   const [showPromoPopup, setShowPromoPopup] = useState(false)
   const [currentSlide, setCurrentSlide] = useState(0)
   const [promoApi, setPromoApi] = useState<any>(null)
+  const [bannerSlide, setBannerSlide] = useState(0)
   const historyButtonRef = useRef<HTMLButtonElement>(null)
 
   const receiptData = [
@@ -177,47 +178,13 @@ export function DigitalReceipt() {
     document.body.removeChild(element)
   }
 
-  const handleShare = async () => {
-    const shareData = {
-      title: "RDEP Fashion Receipt",
-      text: `Receipt #${currentReceipt.receiptNumber} - Total: ₹${currentReceipt.total.toLocaleString("en-IN")}`,
-      url: window.location.href,
-    }
-
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-    const hasWebShare = navigator.share && navigator.canShare && navigator.canShare(shareData)
-
-    if (hasWebShare || (isMobile && navigator.share)) {
-      try {
-        await navigator.share(shareData)
-        return // Successfully shared, don't fall back
-      } catch (error: any) {
-        // Only fallback if it's not a user cancellation (AbortError)
-        if (error.name === "AbortError") {
-          return // User cancelled, don't show fallback
-        }
-        console.log("Share failed, using fallback:", error)
-      }
-    }
-
-    // Fallback to clipboard for desktop or when native share fails
-    fallbackShare()
-  }
-
-  const fallbackShare = () => {
-    const shareText = `RDEP Fashion Receipt #${currentReceipt.receiptNumber} - Total: ₹${currentReceipt.total.toLocaleString("en-IN")} - ${window.location.href}`
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(shareText)
-      alert("Receipt details copied to clipboard!")
-    } else {
-      const textArea = document.createElement("textarea")
-      textArea.value = shareText
-      document.body.appendChild(textArea)
-      textArea.select()
-      document.execCommand("copy")
-      document.body.removeChild(textArea)
-      alert("Receipt details copied to clipboard!")
-    }
+  const handleEmail = () => {
+    const subject = encodeURIComponent(`RDEP Fashion Receipt #${currentReceipt.receiptNumber}`)
+    const body = encodeURIComponent(
+      `Hi,\n\nPlease find my receipt details below:\n\nReceipt #${currentReceipt.receiptNumber}\nDate: ${currentReceipt.date}\nTotal Amount: ₹${currentReceipt.total.toLocaleString("en-IN")}\n\nThank you!\n\nBest regards`,
+    )
+    const mailtoLink = `mailto:?subject=${subject}&body=${body}`
+    window.open(mailtoLink, "_blank")
   }
 
   const handleFeedbackSubmit = () => {
@@ -234,7 +201,14 @@ export function DigitalReceipt() {
     setShowPromoPopup(true)
   }, [])
 
-  // Auto-resize iframe height for WordPress embed
+  useEffect(() => {
+    const bannerInterval = setInterval(() => {
+      setBannerSlide((prev) => (prev + 1) % 2)
+    }, 4000) // Change slide every 4 seconds
+
+    return () => clearInterval(bannerInterval)
+  }, [])
+
   useEffect(() => {
     const postHeight = () => {
       if (window.parent) {
@@ -424,8 +398,40 @@ export function DigitalReceipt() {
 
         <Separator />
 
+        {/* Special Offers Section */}
         <div className="space-y-3">
-          <h2 className="font-semibold text-slate-800">Rate Your Experience</h2>
+          <h2 className="font-semibold text-slate-800 text-center">Special Offers</h2>
+          <div className="relative overflow-hidden rounded-lg">
+            <div
+              className="flex transition-transform duration-500 ease-in-out"
+              style={{ transform: `translateX(-${bannerSlide * 100}%)` }}
+            >
+              <div className="w-full flex-shrink-0">
+                <Image
+                  src="/banner1.avif"
+                  alt="Fashion Sale Banner"
+                  width={400}
+                  height={200}
+                  className="w-full h-auto object-contain"
+                />
+              </div>
+              <div className="w-full flex-shrink-0">
+                <Image
+                  src="/banner2.avif"
+                  alt="Fashion Store Promo Banner"
+                  width={400}
+                  height={200}
+                  className="w-full h-auto object-contain"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <Separator />
+
+        <div className="space-y-3">
+          <h2 className="font-semibold text-slate-800 text-center">Rate Your Experience</h2>
           <div className="bg-slate-50 p-3 rounded-lg space-y-3">
             <div className="flex justify-center gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
@@ -449,6 +455,39 @@ export function DigitalReceipt() {
           </div>
         </div>
 
+        <Separator />
+
+        {/* Follow Us Section */}
+        <div className="space-y-3">
+          <h2 className="font-semibold text-slate-800 text-center">Follow Us</h2>
+          <div className="flex justify-center gap-4">
+            <a
+              href="https://www.facebook.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+            >
+              <Facebook size={20} />
+            </a>
+            <a
+              href="https://www.instagram.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 bg-pink-600 text-white rounded-full hover:bg-pink-700 transition-colors"
+            >
+              <Instagram size={20} />
+            </a>
+            <a
+              href="https://www.rdep.io"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 bg-slate-600 text-white rounded-full hover:bg-slate-700 transition-colors"
+            >
+              <Globe size={20} />
+            </a>
+          </div>
+        </div>
+
         <div className="grid grid-cols-3 gap-2">
           <Button
             ref={historyButtonRef}
@@ -469,14 +508,15 @@ export function DigitalReceipt() {
             <Download size={14} className="mr-1" />
             PDF
           </Button>
+          {/* Email Button */}
           <Button
             variant="outline"
             size="sm"
             className="text-xs border-blue-200 text-blue-900 bg-transparent"
-            onClick={handleShare}
+            onClick={handleEmail}
           >
-            <Share2 size={14} className="mr-1" />
-            Share
+            <Mail size={14} className="mr-1" />
+            Email
           </Button>
         </div>
 
